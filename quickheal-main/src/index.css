@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.doctor-swiper .swiper-button-next,
+.doctor-swiper .swiper-button-prev {
+  color: #000;
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.doctor-swiper .swiper-button-next:after,
+.doctor-swiper .swiper-button-prev:after {
+  font-size: 18px;
+}
+
+.review-swiper .swiper-button-next,
+.review-swiper .swiper-button-prev {
+  color: #000;
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.review-swiper .swiper-button-next:after,
+.review-swiper .swiper-button-prev:after {
+  font-size: 18px;
+}
+
+.review-swiper .swiper-slide {
+  opacity: 0.5;
+  transform: scale(0.9);
+  transition: all 0.3s ease;
+}
+
+.review-swiper .swiper-slide-active {
+  opacity: 1;
+  transform: scale(1);
+}
