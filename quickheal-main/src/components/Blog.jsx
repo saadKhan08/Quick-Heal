@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { memo } from "react";
+import PropTypes from 'prop-types';
 
 const blogPosts = [
   {
@@ -16,7 +18,8 @@ const blogPosts = [
     excerpt: "New discoveries paving the way for innovative treatments...",
     category: "Medical Research",
     date: "Mar 18, 2024",
-    image: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"  },
+    image: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
+  },
   {
     id: 3,
     title: "Mental Health in Modern Era",
@@ -26,6 +29,61 @@ const blogPosts = [
     image: "https://images.unsplash.com/photo-1527689368864-3a821dbccc34?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
   }
 ];
+
+const BlogPost = memo(({ post, index }) => {
+  BlogPost.propTypes = {
+    post: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+      excerpt: PropTypes.string.isRequired,
+      category: PropTypes.string.isRequired,
+      date: PropTypes.string.isRequired,
+      image: PropTypes.string.isRequired
+    }).isRequired,
+    index: PropTypes.number.isRequired
+  };
+
+  return (
+    <motion.article
+      key={post.id}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+    >
+      <div className="relative overflow-hidden group">
+        <img
+          src={post.image}
+          alt={post.title}
+          className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-300"
+          loading="lazy"
+        />
+        <div className="absolute top-4 left-4">
+          <span className="inline-block bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-gray-700">
+            {post.category}
+          </span>
+        </div>
+      </div>
+
+      <div className="p-6">
+        <time className="text-sm text-gray-500 mb-2">{post.date}</time>
+        <h3 className="text-xl font-medium mb-3 line-clamp-2">{post.title}</h3>
+        <p className="text-gray-600 mb-4 line-clamp-2">{post.excerpt}</p>
+        
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="inline-flex items-center gap-2 text-purple-600 font-medium"
+          aria-label={`Read more about ${post.title}`}
+        >
+          Read More
+          <ArrowUpRight className="w-4 h-4" />
+        </motion.button>
+      </div>
+    </motion.article>
+  );
+});
+BlogPost.displayName = 'BlogPost';
 
 const Blog = () => {
   return (
@@ -45,41 +103,7 @@ const Blog = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {blogPosts.map((post, index) => (
-            <motion.article
-              key={post.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-            >
-              <div className="relative overflow-hidden group">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute top-4 left-4">
-                  <span className="inline-block bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-gray-700">
-                    {post.category}
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-6">
-                <div className="text-sm text-gray-500 mb-2">{post.date}</div>
-                <h3 className="text-xl font-medium mb-3 line-clamp-2">{post.title}</h3>
-                <p className="text-gray-600 mb-4 line-clamp-2">{post.excerpt}</p>
-                
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center gap-2 text-purple-600 font-medium"
-                >
-                  Read More
-                  <ArrowUpRight className="w-4 h-4" />
-                </motion.button>
-              </div>
-            </motion.article>
+            <BlogPost key={post.id} post={post} index={index} />
           ))}
         </div>
 
@@ -89,7 +113,10 @@ const Blog = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="text-center mt-12"
         >
-          <button className="bg-black text-white px-6 py-3 rounded-full hover:bg-gray-800 transition-colors duration-300">
+          <button 
+            className="bg-black text-white px-6 py-3 rounded-full hover:bg-gray-800 transition-colors duration-300"
+            aria-label="View all blog articles"
+          >
             View All Articles
           </button>
         </motion.div>
@@ -98,4 +125,4 @@ const Blog = () => {
   );
 };
 
-export default Blog;
+export default memo(Blog);

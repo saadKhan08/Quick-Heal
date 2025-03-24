@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus } from 'lucide-react';
-import { useState } from 'react';
+import { useState, memo, useCallback } from 'react';
 
 const faqs = [
   {
@@ -21,8 +21,71 @@ const faqs = [
   },
 ];
 
+import PropTypes from 'prop-types';
+
+const FAQItem = memo(({ faq, index, isActive, onToggle }) => (
+  <motion.div
+    key={index}
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ delay: index * 0.1 }}
+    className="bg-white rounded-2xl shadow-sm"
+  >
+    <motion.button
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+      onClick={onToggle}
+      className="w-full px-6 py-5 flex items-center justify-between gap-4"
+    >
+      <span className="text-left font-medium">{faq.question}</span>
+      <div className="flex-shrink-0">
+        {isActive ? (
+          <div className="bg-purple-100 p-2 rounded-full">
+            <Minus className="w-4 h-4 text-purple-600" />
+          </div>
+        ) : (
+          <div className="bg-gray-100 p-2 rounded-full">
+            <Plus className="w-4 h-4 text-gray-600" />
+          </div>
+        )}
+      </div>
+    </motion.button>
+
+    <AnimatePresence>
+      {isActive && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="overflow-hidden"
+        >
+          <div className="px-6 pb-5 text-gray-600">
+            {faq.answer}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </motion.div>
+));
+
+FAQItem.displayName = 'FAQItem';
+
+FAQItem.propTypes = {
+  faq: PropTypes.shape({
+    question: PropTypes.string.isRequired,
+    answer: PropTypes.string.isRequired
+  }).isRequired,
+  index: PropTypes.number.isRequired,
+  isActive: PropTypes.bool.isRequired,
+  onToggle: PropTypes.func.isRequired
+};
 const FAQSection = () => {
   const [activeIndex, setActiveIndex] = useState(null);
+
+  const handleToggle = useCallback((index) => {
+    setActiveIndex(activeIndex === index ? null : index);
+  }, [activeIndex]);
 
   return (
     <section className="py-24 px-6 bg-gradient-to-b from-white to-purple-50">
@@ -42,49 +105,13 @@ const FAQSection = () => {
 
         <div className="space-y-4">
           {faqs.map((faq, index) => (
-            <motion.div
+            <FAQItem
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-2xl shadow-sm"
-            >
-              <motion.button
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                onClick={() => setActiveIndex(activeIndex === index ? null : index)}
-                className="w-full px-6 py-5 flex items-center justify-between gap-4"
-              >
-                <span className="text-left font-medium">{faq.question}</span>
-                <div className="flex-shrink-0">
-                  {activeIndex === index ? (
-                    <div className="bg-purple-100 p-2 rounded-full">
-                      <Minus className="w-4 h-4 text-purple-600" />
-                    </div>
-                  ) : (
-                    <div className="bg-gray-100 p-2 rounded-full">
-                      <Plus className="w-4 h-4 text-gray-600" />
-                    </div>
-                  )}
-                </div>
-              </motion.button>
-
-              <AnimatePresence>
-                {activeIndex === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="px-6 pb-5 text-gray-600">
-                      {faq.answer}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+              faq={faq}
+              index={index}
+              isActive={activeIndex === index}
+              onToggle={() => handleToggle(index)}
+            />
           ))}
         </div>
       </div>
@@ -92,4 +119,4 @@ const FAQSection = () => {
   );
 };
 
-export default FAQSection;
+export default memo(FAQSection);
